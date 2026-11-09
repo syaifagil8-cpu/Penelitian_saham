@@ -1,0 +1,7 @@
+Model,MAE harga <= 9400 (n=282),MAE harga > 9400 (n=243)
+NaiveBaseline,108.2,107.5
+LinearRegression,110.0,103.9
+SVR,107.4,104.9
+LSTM,127.3,141.0
+RandomForest,115.7,739.1
+XGBoost,119.2,741.6

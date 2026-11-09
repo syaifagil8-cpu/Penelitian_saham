@@ -1,0 +1,19 @@
+{
+  "LinearRegression": {},
+  "RandomForest": {
+    "max_depth": 20,
+    "min_samples_leaf": 1,
+    "n_estimators": 300
+  },
+  "SVR": {
+    "C": 100,
+    "epsilon": 0.001,
+    "gamma": 0.01,
+    "kernel": "rbf"
+  },
+  "XGBoost": {
+    "learning_rate": 0.1,
+    "max_depth": 3,
+    "n_estimators": 200
+  }
+}

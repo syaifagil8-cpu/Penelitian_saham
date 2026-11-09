@@ -1,0 +1,30 @@
+{
+  "waktu_mulai": "2026-10-17T06:52:22",
+  "di_dalam_docker": true,
+  "python": "3.11.17",
+  "os": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+  "cpu": "13th Gen Intel(R) Core(TM) i5-1335U",
+  "cpu_logis_terlihat": 12,
+  "batas_cpu_kontainer": 1.0,
+  "batas_ram_kontainer_GB": 4.29,
+  "seed": 42,
+  "n_thread_model": 1,
+  "n_pengulangan": 5,
+  "variabel_env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "TF_ENABLE_ONEDNN_OPTS": "0",
+    "PYTHONHASHSEED": "0"
+  },
+  "library": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.7.2",
+    "joblib": "1.6.0",
+    "psutil": "7.2.2",
+    "xgboost": "3.2.0",
+    "tensorflow": "2.21.0",
+    "matplotlib": "3.10.9"
+  }
+}

@@ -1,0 +1,11 @@
+# Layanan tampilan: hanya Streamlit, tanpa TensorFlow, jadi ringan.
+ARG PYTHON_VERSION=3.11
+FROM python:${PYTHON_VERSION}-slim
+ENV PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
+WORKDIR /app
+COPY requirements-ui.txt .
+RUN pip install --default-timeout=120 --retries 10 -r requirements-ui.txt
+COPY app/ui ./ui
+# Streamlit membaca .streamlit/config.toml (tema) dari folder tempat perintah dijalankan
+WORKDIR /app/ui
+CMD ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0", "--browser.gatherUsageStats=false"]

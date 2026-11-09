@@ -1,0 +1,52 @@
+services:
+  experiment:                       # Tahap 2-8: latih dan evaluasi (tidak berubah)
+    build:
+      context: .
+      args:
+        PYTHON_VERSION: "3.11"      # samakan dengan keluaran make_requirements.py
+    image: saham-experiment:1.0
+    cpus: 1.0
+    mem_limit: 4g
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./results:/app/results
+      - ./runs:/app/runs
+    command: python src/run_all.py
+
+  api:                              # memuat model tersimpan, melayani prediksi
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+      args:
+        PYTHON_VERSION: "3.11"
+    image: saham-api:1.0
+    cpus: 1.0
+    mem_limit: 2g
+    volumes:                        # hanya-baca: aplikasi tidak boleh mengubah dataset, model, atau hasil
+      - ./data:/app/data:ro
+      - ./models:/app/models:ro
+      - ./results:/app/results:ro
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 60s             # TensorFlow butuh waktu memuat model
+
+  ui:                               # tampilan Streamlit
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+      args:
+        PYTHON_VERSION: "3.11"
+    image: saham-ui:1.0
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy

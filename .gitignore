@@ -1,0 +1,20 @@
+﻿# lingkungan Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# rahasia dan file lokal
+.env
+*.log
+
+# database riwayat
+*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+
+# file besar yang bisa dibuat ulang
+models/

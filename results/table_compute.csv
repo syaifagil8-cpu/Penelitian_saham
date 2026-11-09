@@ -1,0 +1,6 @@
+Model,Training (s),Inferensi 1 sampel (ms),Inferensi batch 525 (ms),Ukuran model (KB),Waktu tuning (s),"RAM training (MB, perkiraan)"
+LinearRegression,0.004 ± 0.003,0.040 ± 0.010,0.09,0.8,0.0,0.3
+RandomForest,7.631 ± 0.042,8.269 ± 0.179,17.71,46264.3,120.1,13.3
+SVR,0.349 ± 0.003,0.131 ± 0.003,39.51,290.4,18.8,0.0
+XGBoost,0.105 ± 0.004,0.218 ± 0.028,1.01,228.8,10.4,0.0
+LSTM,44.017 ± 5.818,95.917 ± 10.911,166.3,275.6,131.4,18.9

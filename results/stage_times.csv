@@ -1,0 +1,7 @@
+tahap,detik,puncak_RAM_kontainer_MB_kumulatif,kode_keluar
+preprocessing,0.8,167.7,0
+features,0.6,174.2,0
+prepare_data,3.5,373.6,0
+train_ml,198.9,511.5,0
+train_lstm,488.5,1782.7,0
+evaluate,4.3,1782.7,0
