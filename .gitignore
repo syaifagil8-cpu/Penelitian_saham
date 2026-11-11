@@ -1,4 +1,4 @@
-﻿# lingkungan Python
+# lingkungan Python
 venv/
 .venv/
 __pycache__/
@@ -17,4 +17,9 @@ __pycache__/
 .idea/
 
 # file besar yang bisa dibuat ulang
-models/
+
+# Model untuk deployment API
+models/*
+!models/
+!models/*.joblib
+!models/*.keras
