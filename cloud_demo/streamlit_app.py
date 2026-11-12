@@ -1,10 +1,10 @@
-
 from pathlib import Path
 import json
+import os
 
 import pandas as pd
 import streamlit as st
-
+import requests
 # =========================================================
 # KONFIGURASI
 # =========================================================
@@ -12,6 +12,10 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
 RESULTS_DIR = ROOT / "results"
+API_URL = os.getenv(
+    "API_URL",
+    "https://bbca-cloud-api-2318c.containers.snapdeploy.app"
+).rstrip("/")
 
 st.set_page_config(
     page_title="Prediksi Saham BBCA",
@@ -21,9 +25,25 @@ st.set_page_config(
 )
 
 
+
 # =========================================================
 # FUNGSI MEMBACA DATA
 # =========================================================
+
+@st.cache_data(ttl=300)
+def api_get(endpoint):
+    try:
+        response = requests.get(
+            f"{API_URL}/{endpoint.lstrip('/')}",
+            timeout=30
+        )
+        response.raise_for_status()
+        return response.json()
+
+    except requests.RequestException as error:
+        st.error(f"Gagal mengakses API ({endpoint}): {error}")
+        return None
+
 
 @st.cache_data
 def load_csv(path):
@@ -40,30 +60,54 @@ def load_json(path):
         return json.load(file)
 
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def load_predictions():
-    ml = load_csv(RESULTS_DIR / "predictions_ml.csv")
-    lstm = load_csv(RESULTS_DIR / "predictions_lstm.csv")
+    data = api_get("predictions?model=all&limit=525")
 
-    if ml.empty:
+    if not data:
         return pd.DataFrame()
 
-    if not lstm.empty:
-        lstm = lstm.drop(columns=["Actual"], errors="ignore")
-        data = ml.merge(lstm, on="Date", how="left")
-    else:
-        data = ml.copy()
+    df = pd.DataFrame(data)
 
-    data["Date"] = pd.to_datetime(data["Date"])
-    return data.sort_values("Date")
+    if "Date" in df.columns:
+        df["Date"] = pd.to_datetime(df["Date"])
+
+    return df.sort_values("Date")
 
 
+# Data dari API online
 predictions = load_predictions()
-all_results = load_csv(RESULTS_DIR / "all_results.csv")
-accuracy = load_csv(RESULTS_DIR / "table_accuracy.csv")
+
+results_data = api_get("results")
+all_results = (
+    pd.DataFrame(results_data)
+    if isinstance(results_data, list)
+    else pd.DataFrame()
+)
+
+metrics_data = api_get("metrics") or {}
+
+accuracy = pd.DataFrame(
+    metrics_data.get("accuracy", [])
+)
+
+compute = pd.DataFrame(
+    metrics_data.get("computation", [])
+)
+
+significance = pd.DataFrame(
+    metrics_data.get("significance", [])
+)
+
+price_range = pd.DataFrame(
+    metrics_data.get("price_range", [])
+)
+
+environment = api_get("environment") or {}
+
+# Dataset dan fitur tetap dari repository
 dataset = load_csv(DATA_DIR / "dataset_BBCA_clean.csv")
 features_info = load_json(DATA_DIR / "features.json")
-environment = load_json(RESULTS_DIR / "environment.json")
 
 
 # =========================================================
@@ -307,12 +351,14 @@ elif menu == "Perbandingan Model":
         ("fig_tradeoff.png", "Trade-off Kinerja Model")
     ]
 
-    for filename, title in figures:
-        path = RESULTS_DIR / filename
+    for filename, caption in figures:
+        image_url = f"{API_URL}/figure/{filename}"
 
-        if path.exists():
-            st.markdown(f"**{title}**")
-            st.image(str(path), use_container_width=True)
+    st.image(
+        image_url,
+        caption=caption,
+        use_container_width=True
+    )
 
 
 # =========================================================
@@ -322,14 +368,6 @@ elif menu == "Perbandingan Model":
 elif menu == "Analisis Eksperimen":
 
     st.header("Analisis Eksperimen")
-
-    compute = load_csv(RESULTS_DIR / "table_compute.csv")
-    significance = load_csv(
-        RESULTS_DIR / "table_significance.csv"
-    )
-    price_range = load_csv(
-        RESULTS_DIR / "table_by_price_range.csv"
-    )
 
     if not compute.empty:
         st.subheader("Waktu Komputasi dan Ukuran Model")
